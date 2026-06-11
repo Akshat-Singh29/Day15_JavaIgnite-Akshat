@@ -1,4 +1,83 @@
-/*
+class Classroom {
+    private boolean attendanceStarted = false;
+
+    // Student waits until teacher starts attendance
+    public synchronized void waitForAttendance() {
+        while (!attendanceStarted) {
+            try {
+                System.out.println(Thread.currentThread().getName() + " : Student Waiting...");
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println(Thread.currentThread().getName() + " : Student Marked Present");
+    }
+
+    // Teacher starts attendance and notifies all students
+    public synchronized void startAttendance() {
+        attendanceStarted = true;
+        System.out.println("Teacher Started Attendance");
+        notifyAll();
+    }
+}
+
+// Teacher Thread
+class TeacherThread extends Thread {
+    private Classroom classroom;
+
+    public TeacherThread(Classroom classroom) {
+        this.classroom = classroom;
+    }
+
+    public void run() {
+        classroom.startAttendance();
+    }
+}
+
+// Student Thread
+class StudentThread extends Thread {
+    private Classroom classroom;
+
+    public StudentThread(Classroom classroom, String name) {
+        super(name);
+        this.classroom = classroom;
+    }
+
+    public void run() {
+        classroom.waitForAttendance();
+    }
+}
+
+// Main Class
+public class AttendanceSystem {
+    public static void main(String[] args) {
+        Classroom classroom = new Classroom();
+
+        // Create student threads
+        StudentThread s1 = new StudentThread(classroom, "Student-1");
+        StudentThread s2 = new StudentThread(classroom, "Student-2");
+        StudentThread s3 = new StudentThread(classroom, "Student-3");
+
+        // Create teacher thread
+        TeacherThread teacher = new TeacherThread(classroom);
+
+        // Start students first
+        s1.start();
+        s2.start();
+        s3.start();
+
+        // Wait for a few seconds
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Start teacher thread
+        teacher.start();
+    }
+}/*
 Classroom Attendance System
 
 Teacher thread:
