@@ -1,4 +1,59 @@
-/*
+// Theater Class
+class Theater {
+    private int totalSeats = 5;
+
+    // Synchronized method for booking seats
+    public synchronized void bookSeat(int seats) {
+
+        if (totalSeats >= seats) {
+            System.out.println(Thread.currentThread().getName()
+                    + " Booking Successful");
+
+            totalSeats -= seats;
+
+            System.out.println("Remaining Seats = " + totalSeats);
+        } else {
+            System.out.println(Thread.currentThread().getName()
+                    + " Booking Failed");
+        }
+    }
+}
+
+// BookingThread Class
+class BookingThread extends Thread {
+    private Theater theater;
+    private int seatsRequired;
+
+    public BookingThread(Theater theater, int seatsRequired, String threadName) {
+        super(threadName);
+        this.theater = theater;
+        this.seatsRequired = seatsRequired;
+    }
+
+    @Override
+    public void run() {
+        theater.bookSeat(seatsRequired);
+    }
+}
+
+// Main Class
+public class TicketBookingSystem {
+    public static void main(String[] args) {
+
+        // Create Theater object
+        Theater theater = new Theater();
+
+        // Create booking threads
+        BookingThread thread1 = new BookingThread(theater, 2, "Thread1");
+        BookingThread thread2 = new BookingThread(theater, 2, "Thread2");
+        BookingThread thread3 = new BookingThread(theater, 2, "Thread3");
+
+        // Start threads
+        thread1.start();
+        thread2.start();
+        thread3.start();
+    }
+}/*
 Ticket Booking System
 
 A movie theater has:
